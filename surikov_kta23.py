@@ -1,8 +1,11 @@
 from bs4 import BeautifulSoup
+from tqdm import tqdm
 import os
+import time
+
 product_id_last = ''
 directory = os.getcwd() #Ваша нынешняя директория
-subdirectory = '/.venv/halftest' #папка в директории где ваши файлы
+subdirectory = '/halftest' #папка в директории где ваши файлы
 csv_file_name = 'tags.csv'
 
 with open(csv_file_name, 'w', newline='') as f: # Создаем файл csv
@@ -14,7 +17,9 @@ def file_parser(file_name,product_id_last): #Движок поиска имен�
 
     HTMLFileToBeOpened = open(file_name, "r")
     contents = HTMLFileToBeOpened.read()
+
     BeautifulSoupText = BeautifulSoup(contents, 'html.parser')
+
     tag=BeautifulSoupText.find_all('script')[2] # наши файлы находятся во 2 тэги скрипт
     tag2=BeautifulSoupText.find_all('td' and 'b')
     tag_splited=tag.get_text().split(',')
@@ -28,10 +33,12 @@ def file_parser(file_name,product_id_last): #Движок поиска имен�
         pass
     return product_id_last
 
-for filename in os.listdir(directory+subdirectory): #Загрузка всех файлов с индексом .html
-    if filename.endswith('.html'):
-        fname = os.path.join(directory+subdirectory, filename)
-        product_id_last=file_parser(fname,product_id_last)
+for i in tqdm(range(len(os.listdir(directory+subdirectory))-1)):#Загрузка всех файлов с индексом .html
+    if os.listdir(directory + subdirectory)[i].endswith('.html'):
+        fname = os.path.join(directory + subdirectory, os.listdir(directory + subdirectory)[i])
+        product_id_last = file_parser(fname, product_id_last)
+    time.sleep(0.1)
 
+print("Complete.")
 
 
